@@ -6,7 +6,9 @@ import filesize from 'rollup-plugin-filesize';
 import {uglify} from 'rollup-plugin-uglify';
 import pkg from './package.json';
 
-const external = (id) => !id.startsWith('.') && !id.startsWith('/');
+const external = (id) => {
+  return !id.startsWith('.') && id.indexOf('react-sortable-hoc') === -1;
+};
 
 const babelConfig = (
   {useESModules, targets} = {
@@ -15,20 +17,27 @@ const babelConfig = (
   },
 ) => ({
   comments: false,
-  runtimeHelpers: true,
+  // runtimeHelpers: true,
   presets: [
-    '@babel/preset-react',
-    [
-      '@babel/preset-env',
-      {
-        targets,
-      },
-    ],
+    '@babel/react',
+    // [
+    //   '@babel/preset-env',
+    //   {
+    //     targets,
+    //   },
+    // ],
   ],
   plugins: [
     '@babel/plugin-proposal-class-properties',
-    ['@babel/transform-runtime', {useESModules, regenerator: false}],
-    ['babel-plugin-transform-async-to-promises', {inlineHelpers: true}],
+    // [
+    //   '@babel/transform-runtime',
+    //   {
+    //     useESModules,
+    //     regenerator: false,
+    //     corejs: 3,
+    //   },
+    // ],
+    // ['babel-plugin-transform-async-to-promises', {inlineHelpers: true}],
   ],
   exclude: 'node_modules/**',
 });
@@ -38,7 +47,7 @@ const umdConfig = ({minify} = {}) => ({
   external: ['react', 'react-dom', 'prop-types'],
   output: {
     name: 'SortableHOC',
-    file: minify ? pkg["umd:main"].replace('.js', '.min.js') : pkg["umd:main"],
+    file: minify ? pkg['umd:main'].replace('.js', '.min.js') : pkg['umd:main'],
     format: 'umd',
     globals: {
       react: 'React',
@@ -59,15 +68,15 @@ const umdConfig = ({minify} = {}) => ({
       ),
     }),
     commonjs(),
-    minify ? uglify() : { },
+    minify ? uglify() : {},
     filesize(),
   ],
 });
 
 const rollupConfig = [
   // Browser-friendly UMD builds
-  umdConfig(),
-  umdConfig({minify: true}),
+  // umdConfig(),
+  // umdConfig({ minify: true }),
 
   // CommonJS
   {
